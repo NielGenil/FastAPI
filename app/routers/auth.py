@@ -11,7 +11,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=schemas.UserOut, status_code=201)
 def register(data: schemas.UserCreate, db: Session = Depends(get_db)):
     if db.scalar(select(models.User).where(models.User.email == data.email)):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email already registered")
+        raise HTTPException(400, "Email already registered")
     user = models.User(email=data.email, full_name=data.full_name,
                        hashed_password=hash_password(data.password))
     db.add(user)

@@ -22,7 +22,7 @@ def create_access_token(user_id: int) -> str:
     return jwt.encode({"sub": str(user_id), "exp": expire}, settings.secret_key, algorithm=settings.algorithm)
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> models.User:
-    error = HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or expired token")
+    error = HTTPException(401, "Invalid or expired token")
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         user_id = int(payload["sub"])
@@ -35,5 +35,5 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 def require_admin(user: models.User = Depends(get_current_user)) -> models.User:
     if not user.is_admin:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Admins only")
+        raise HTTPException(403, "Admins only")
     return user
